@@ -1,7 +1,9 @@
 package com.sweetshopproject.store.controller;
 
 import com.sweetshopproject.store.entity.Sweets;
-import com.sweetshopproject.store.repository.SweetsRepository;
+import com.sweetshopproject.store.exception.InvalidDataException;
+import com.sweetshopproject.store.service.SweetService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,34 +12,46 @@ import java.util.List;
 @RequestMapping("/api/sweets")
 public class SweetController {
 
-    private final SweetsRepository sweetRepository;
+    private final SweetService sweetService;
 
-    public SweetController(SweetsRepository sweetRepository) {
-        this.sweetRepository = sweetRepository;
+    public SweetController(SweetService sweetService) {
+        this.sweetService = sweetService;
     }
 
-    @PostMapping("/addSweet")
-    public Sweets addSweet(@RequestBody Sweets sweet) {
-        return sweetRepository.save(sweet);
+    // SEARCH
+    @GetMapping("/search")
+    public List<Sweets> searchSweets(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice)
+            throws InvalidDataException {
+
+        return sweetService.searchSweets(name, category, minPrice, maxPrice);
     }
 
-    @GetMapping("/list-sweet")
-    public List<Sweets> getAll() {
-        return sweetRepository.findAll();
+    // RESTOCK (ADMIN)
+    @PostMapping("/{id}/restock")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String restockSweet(@PathVariable Integer id,
+                               @RequestParam int quantity)
+            throws InvalidDataException {
+
+        return sweetService.restockSweet(id, quantity);
     }
 
-    @PutMapping("/update/{id}")
-    public Sweets update(@PathVariable Integer id, @RequestBody Sweets sweet) {
-        Sweets sweet1 = sweetRepository.findById(id).orElseThrow();
-        sweet1.setName(sweet.getName());
-        sweet1.setCategory(sweet.getCategory());
-        sweet1.setPrice(sweet.getPrice());
-        sweet1.setQuantity(sweet.getQuantity());
-        return sweetRepository.save(sweet1);
+    // PURCHASE
+    @PostMapping("/{id}/purchase")
+    public String purchaseSweet(@PathVariable Integer id,
+                                @RequestParam int quantity)
+            throws InvalidDataException {
+
+        return sweetService.purchaseSweet(id, quantity);
     }
 
+    // DELETE
     @DeleteMapping("/delete/{id}")
     public void delete(@PathVariable Integer id) {
-        sweetRepository.deleteById(id);
+        sweetService.deleteSweet(id);
     }
 }
