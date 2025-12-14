@@ -30,13 +30,13 @@ public class SweetController {
     }
 
     @PostMapping("/add")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Sweets addSweet(@RequestBody Sweets sweet) {
         return sweetService.createSweet(sweet);
     }
 
     @PostMapping("/{id}/restock")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String restockSweet(@PathVariable Integer id,
                                @RequestParam int quantity)
             throws InvalidDataException {
@@ -53,7 +53,7 @@ public class SweetController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void delete(@PathVariable Integer id) {
         sweetService.deleteSweet(id);
     }
