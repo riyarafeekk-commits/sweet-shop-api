@@ -18,6 +18,17 @@ public class SweetController {
         this.sweetService = sweetService;
     }
 
+    @GetMapping
+    public List<Sweets> getAllSweets() {
+        return sweetService.getAllSweets();
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public Sweets updateSweet(@PathVariable Integer id, @RequestBody Sweets sweet) throws InvalidDataException {
+        return sweetService.updateSweet(id, sweet);
+    }
+
     @GetMapping("/search")
     public List<Sweets> searchSweets(
             @RequestParam(required = false) String name,
