@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+
 public class SweetService {
 
     private final SweetsRepository sweetRepository;
@@ -37,15 +38,12 @@ public class SweetService {
                 .toList();
     }
 
+    public Sweets createSweet(Sweets sweet) {
+        return sweetRepository.save(sweet);
+    }
+
     public String restockSweet(Integer id, int quantity)
             throws InvalidDataException {
-
-        if (quantity <= 0) {
-            throw new InvalidDataException(
-                    "Quantity must be greater than zero",
-                    "Invalid quantity"
-            );
-        }
 
         Sweets sweet = sweetRepository.findById(id)
                 .orElseThrow(() ->
@@ -55,10 +53,19 @@ public class SweetService {
                         )
                 );
 
-        sweet.setQuantity(sweet.getQuantity() + quantity);
+        int newQuantity = sweet.getQuantity() + quantity;
+
+        if (newQuantity < 0) {
+            throw new InvalidDataException(
+                    "Cannot reduce stock below zero. Current stock: " + sweet.getQuantity(),
+                    "Insufficient stock"
+            );
+        }
+
+        sweet.setQuantity(newQuantity);
         sweetRepository.save(sweet);
 
-        return "Restocked " + quantity + " " + sweet.getName();
+        return "Stock updated. New quantity for " + sweet.getName() + ": " + newQuantity;
     }
 
     public String purchaseSweet(Integer id, int quantity)
@@ -96,5 +103,8 @@ public class SweetService {
         sweetRepository.deleteById(id);
     }
 }
+
+
+
 
 
