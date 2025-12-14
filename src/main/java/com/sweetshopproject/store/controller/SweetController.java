@@ -18,7 +18,6 @@ public class SweetController {
         this.sweetService = sweetService;
     }
 
-    // SEARCH
     @GetMapping("/search")
     public List<Sweets> searchSweets(
             @RequestParam(required = false) String name,
@@ -30,7 +29,12 @@ public class SweetController {
         return sweetService.searchSweets(name, category, minPrice, maxPrice);
     }
 
-    // RESTOCK (ADMIN)
+    @PostMapping("/add")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Sweets addSweet(@RequestBody Sweets sweet) {
+        return sweetService.createSweet(sweet);
+    }
+
     @PostMapping("/{id}/restock")
     @PreAuthorize("hasRole('ADMIN')")
     public String restockSweet(@PathVariable Integer id,
@@ -40,7 +44,6 @@ public class SweetController {
         return sweetService.restockSweet(id, quantity);
     }
 
-    // PURCHASE
     @PostMapping("/{id}/purchase")
     public String purchaseSweet(@PathVariable Integer id,
                                 @RequestParam int quantity)
@@ -49,8 +52,8 @@ public class SweetController {
         return sweetService.purchaseSweet(id, quantity);
     }
 
-    // DELETE
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable Integer id) {
         sweetService.deleteSweet(id);
     }
