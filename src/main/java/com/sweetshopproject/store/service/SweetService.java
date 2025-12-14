@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-
 public class SweetService {
 
     private final SweetsRepository sweetRepository;
@@ -102,9 +101,33 @@ public class SweetService {
     public void deleteSweet(Integer id) {
         sweetRepository.deleteById(id);
     }
+
+    public List<Sweets> getAllSweets() {
+        return sweetRepository.findAll();
+    }
+
+    public Sweets updateSweet(Integer id, Sweets sweetDetails)
+            throws InvalidDataException {
+
+        Sweets sweet = sweetRepository.findById(id)
+                .orElseThrow(() ->
+                        new InvalidDataException(
+                                "Sweet not found with id " + id,
+                                "Sweet not found"
+                        )
+                );
+
+        sweet.setName(sweetDetails.getName());
+        sweet.setCategory(sweetDetails.getCategory());
+        sweet.setPrice(sweetDetails.getPrice());
+
+        // Note: Quantity is usually handled via restock/purchase but we allow update here too
+        if(sweetDetails.getQuantity() != null) {
+            sweet.setQuantity(sweetDetails.getQuantity());
+        }
+
+        return sweetRepository.save(sweet);
+    }
 }
-
-
-
 
 
