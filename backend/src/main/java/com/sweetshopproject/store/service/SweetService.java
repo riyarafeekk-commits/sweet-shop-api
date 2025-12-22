@@ -124,6 +124,7 @@ public class SweetService {
         // Note: Quantity is usually handled via restock/purchase but we allow update here too
         if(sweetDetails.getQuantity() != null) {
              sweet.setQuantity(sweetDetails.getQuantity());
+
         }
 
         return sweetRepository.save(sweet);
