@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: sweet-shop-postgres
+    environment:
+      POSTGRES_DB: sweet-shop
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 5743
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sweet-shop-network
+
+  backend:
+    build: ./backend
+    container_name: sweet-shop-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sweet-shop
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 5743
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - sweet-shop-network
+
+  frontend:
+    build: ./frontend
+    container_name: sweet-shop-frontend
+    ports:
+      - "3000:80"
+    networks:
+      - sweet-shop-network
+
+networks:
+  sweet-shop-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
